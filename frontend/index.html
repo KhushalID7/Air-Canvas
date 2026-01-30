@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<video id="video" autoplay></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById('video');
+
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream => video.srcObject = stream);
+
+async function sendFrame(){
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 320;
+    canvas.height = 240;
+
+    ctx.drawImage(video,0,0,320,240);
+
+    const blob = await new Promise(r => canvas.toBlob(r,'image/jpeg'));
+
+    let formData = new FormData();
+    formData.append("file", blob);
+
+    await fetch("http://127.0.0.1:8000/frame",{
+        method:"POST",
+        body:formData
+    });
+
+    requestAnimationFrame(sendFrame);
+}
+
+sendFrame();
+</script>
+
+</body>
+</html>
