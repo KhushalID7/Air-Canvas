@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html>
+<head>
+<style>
+#video {
+    display: none;
+}
+</style>
+</head>
 <body>
 
 <video id="video" autoplay></video>
@@ -7,27 +14,41 @@
 
 <script>
 const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = 640;
+canvas.height = 480;
 
 navigator.mediaDevices.getUserMedia({video:true})
 .then(stream => video.srcObject = stream);
 
 async function sendFrame(){
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 320;
-    canvas.height = 240;
+    const temp = document.createElement('canvas');
+    const tctx = temp.getContext('2d');
 
-    ctx.drawImage(video,0,0,320,240);
+    temp.width = 640;
+    temp.height = 480;
+    tctx.drawImage(video,0,0,640,480);
 
-    const blob = await new Promise(r => canvas.toBlob(r,'image/jpeg'));
+    const blob = await new Promise(r => temp.toBlob(r,'image/jpeg'));
 
     let formData = new FormData();
     formData.append("file", blob);
 
-    await fetch("http://127.0.0.1:8000/frame",{
+    const res = await fetch("http://127.0.0.1:8000/frame",{
         method:"POST",
         body:formData
     });
+
+    const imgBlob = await res.blob();
+    const img = new Image();
+
+    img.onload = () => {
+        ctx.drawImage(img,0,0,640,480);
+    };
+
+    img.src = URL.createObjectURL(imgBlob);
 
     requestAnimationFrame(sendFrame);
 }
