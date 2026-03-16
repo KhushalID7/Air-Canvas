@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "GestureNav – Touchless Browser Control",
+  "version": "1.0.0",
+  "description": "Control your browser with hand gestures using your webcam. No Python, no setup — 100% in-browser.",
+
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "scripting",
+    "sidePanel",
+    "windows"
+  ],
+  "host_permissions": ["<all_urls>"],
+
+  "background": {
+    "service_worker": "background/background.js"
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+
+  "action": {
+    "default_title": "Open GestureNav"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"]
+    }
+  ],
+
+  "icons": {}
+}

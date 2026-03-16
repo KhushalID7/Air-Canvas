@@ -1,0 +1,217 @@
+/* ── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0d0d0f;
+  --surface:     #161618;
+  --border:      #2a2a2e;
+  --accent:      #3b82f6;
+  --accent-dim:  rgba(59,130,246,0.15);
+  --green:       #22c55e;
+  --red:         #ef4444;
+  --yellow:      #eab308;
+  --text:        #e2e8f0;
+  --muted:       #64748b;
+  --radius:      10px;
+}
+
+html { font-size: 13px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  min-width: 300px;
+  max-width: 400px;
+  padding-bottom: 24px;
+  overflow-x: hidden;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-icon { font-size: 20px; }
+.brand-name { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+
+/* ── Status pill ───────────────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+
+.pill--idle    { background: #1e1e20; color: var(--muted); }
+.pill--idle::before    { background: var(--muted); }
+
+.pill--loading { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.pill--loading::before { background: var(--yellow); animation: blink 1s infinite; }
+
+.pill--live    { background: rgba(34,197,94,0.15); color: var(--green); }
+.pill--live::before    { background: var(--green); animation: blink 1.5s infinite; }
+
+.pill--error   { background: rgba(239,68,68,0.15); color: var(--red); }
+.pill--error::before   { background: var(--red); }
+
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+/* ── Camera preview ────────────────────────────────────────────────────────── */
+.preview-wrap {
+  position: relative;
+  margin: 14px 16px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--border);
+  aspect-ratio: 4/3;
+}
+
+.preview-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* Mirror the webcam so it feels natural. */
+  transform: scaleX(-1);
+}
+
+.gesture-label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.65);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  text-transform: uppercase;
+}
+
+.action-label {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.72);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 12px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.action-label.visible { opacity: 1; }
+
+/* ── Controls ──────────────────────────────────────────────────────────────── */
+.controls {
+  padding: 14px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn--start {
+  background: var(--accent);
+  color: #fff;
+}
+.btn--stop {
+  background: #1e1e20;
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Gesture guide ─────────────────────────────────────────────────────────── */
+.guide {
+  margin: 18px 16px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.guide-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.guide-table th {
+  text-align: left;
+  padding: 7px 14px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-table td {
+  padding: 6px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+
+.guide-table tbody tr:last-child td { border-bottom: none; }
+
+.guide-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+
+.glyph { margin-right: 2px; }
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.2px;
+  padding: 0 16px;
+}

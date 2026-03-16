@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Canvas</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0f; color: #f0f0f0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 24px; background: #111; border-bottom: 1px solid #1e1e1e;
+    }
+    header a { color: #8ab8e8; text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+    header a:hover { color: #aad4ff; }
+    header h1 { font-size: 1.15rem; font-weight: 600; }
+    .badge {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 3px 9px; border-radius: 20px;
+      background: #2a2a38; color: #888;
+    }
+    .spacer { flex: 1; }
+
+    main {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 24px 20px; gap: 18px;
+    }
+
+    #canvas {
+      border-radius: 10px; border: 1px solid #222; display: block;
+      max-width: 100%;
+    }
+
+    .controls { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; transition: background 0.15s;
+    }
+    #btn-clear { background: #6b1f1f; color: #fff; }
+    #btn-clear:hover { background: #8b2a2a; }
+
+    .tip {
+      font-size: 0.82rem; color: #555; text-align: center;
+      max-width: 680px; line-height: 1.8;
+    }
+    .tip strong { color: #888; }
+
+    #video { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← Home</a>
+    <h1>Air Canvas</h1>
+    <span class="badge">Sub Feature</span>
+    <div class="spacer"></div>
+    <button class="btn" id="btn-clear" onclick="clearCanvas()">🗑 Clear Canvas</button>
+  </header>
+
+  <main>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+
+    <p class="tip">
+      <strong>☝️ Index finger only</strong> — draw / erase &nbsp;|&nbsp;
+      <strong>✌️ Two fingers</strong> — move without marking &nbsp;|&nbsp;
+      <strong>🤏 Pinch</strong> — pen up (lift) &nbsp;|&nbsp;
+      <strong>✊ Fist</strong> — toggle pen ↔ eraser
+    </p>
+  </main>
+
+  <script>
+    const video  = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx    = canvas.getContext('2d');
+    const API    = 'http://127.0.0.1:8000';
+
+    canvas.width  = 1280;
+    canvas.height = 480;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; });
+
+    async function sendFrame() {
+      const tmp  = document.createElement('canvas');
+      tmp.width  = 640;
+      tmp.height = 480;
+      tmp.getContext('2d').drawImage(video, 0, 0, 640, 480);
+
+      const blob = await new Promise(r => tmp.toBlob(r, 'image/jpeg'));
+      const fd   = new FormData();
+      fd.append('file', blob);
+
+      const res     = await fetch(`${API}/canvas/frame`, { method: 'POST', body: fd });
+      const imgBlob = await res.blob();
+      const img     = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(img.src);
+      };
+      img.src = URL.createObjectURL(imgBlob);
+
+      requestAnimationFrame(sendFrame);
+    }
+
+    async function clearCanvas() {
+      await fetch(`${API}/canvas/clear`, { method: 'POST' });
+    }
+
+    sendFrame();
+  </script>
+</body>
+</html>

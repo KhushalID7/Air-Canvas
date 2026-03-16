@@ -1,61 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-#video {
-    display: none;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirControl</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d0f;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 52px;
+      padding: 48px 24px;
+    }
+    .hero { text-align: center; }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #6ab0f5, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p { margin-top: 14px; font-size: 1.1rem; color: #777; }
+    .cards { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 36px 30px;
+      border-radius: 18px;
+      text-decoration: none;
+      color: #f0f0f0;
+      width: 290px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-7px); }
+    .card.main {
+      background: linear-gradient(160deg, #0f2035, #0a1525);
+      border: 1.5px solid #2a6aad;
+      box-shadow: 0 0 28px #1a4a8a33;
+    }
+    .card.sub {
+      background: #131318;
+      border: 1.5px solid #2a2a35;
+      box-shadow: 0 0 12px #00000033;
+    }
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+    .card.main .badge { background: #2a6aad; color: #fff; }
+    .card.sub  .badge { background: #2a2a38; color: #888; }
+    .card .icon { font-size: 2.6rem; }
+    .card h2 { font-size: 1.3rem; font-weight: 600; }
+    .card.main p { font-size: 0.9rem; color: #7aaee8; line-height: 1.6; }
+    .card.sub  p { font-size: 0.9rem; color: #666;    line-height: 1.6; }
+    footer { color: #333; font-size: 0.78rem; letter-spacing: 1px; }
+  </style>
 </head>
 <body>
+  <div class="hero">
+    <h1>AirControl</h1>
+    <p>Control your computer with nothing but your hands</p>
+  </div>
 
-<video id="video" autoplay></video>
-<canvas id="canvas"></canvas>
+  <div class="cards">
+    <a href="gesture.html" class="card main">
+      <span class="badge">Main Feature</span>
+      <div class="icon">🖐️</div>
+      <h2>Gesture Browser Control</h2>
+      <p>Navigate, scroll, click, switch tabs and go back/forward — all with hand gestures via your webcam.</p>
+    </a>
 
-<script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+    <a href="canvas.html" class="card sub">
+      <span class="badge">Sub Feature</span>
+      <div class="icon">✏️</div>
+      <h2>Air Canvas</h2>
+      <p>Draw on a virtual canvas by waving your finger in the air. Switch between pen and eraser modes.</p>
+    </a>
+  </div>
 
-canvas.width = 1280;
-canvas.height = 480;
-
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream => video.srcObject = stream);
-
-async function sendFrame(){
-    const temp = document.createElement('canvas');
-    const tctx = temp.getContext('2d');
-
-    temp.width = 640;
-    temp.height = 480;
-    tctx.drawImage(video,0,0,640,480);
-
-    const blob = await new Promise(r => temp.toBlob(r,'image/jpeg'));
-
-    let formData = new FormData();
-    formData.append("file", blob);
-
-    const res = await fetch("http://127.0.0.1:8000/frame",{
-        method:"POST",
-        body:formData
-    });
-
-    const imgBlob = await res.blob();
-    const img = new Image();
-
-    img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(img.src);
-    };
-
-    img.src = URL.createObjectURL(imgBlob);
-
-    requestAnimationFrame(sendFrame);
-}
-
-sendFrame();
-</script>
-
+  <footer>Python · FastAPI · MediaPipe · OpenCV</footer>
 </body>
+</html>
 </html>

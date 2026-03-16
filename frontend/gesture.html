@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gesture Browser Control</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d0f; color: #f0f0f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    header {
+      display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+      padding: 13px 24px; background: #111; border-bottom: 1px solid #1e1e1e;
+    }
+    header a { color: #8ab8e8; text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+    header a:hover { color: #aad4ff; }
+    header h1   { font-size: 1.15rem; font-weight: 600; }
+    .badge-main {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 3px 9px; border-radius: 20px;
+      background: #2a6aad; color: #fff;
+    }
+    .spacer { flex: 1; }
+    #status-pill {
+      padding: 4px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      background: #1c1c1c; border: 1px solid #333; color: #888;
+      transition: all 0.3s;
+    }
+    #status-pill.live   { background: #0d2010; border-color: #2a6a2a; color: #5de85d; }
+    #status-pill.error  { background: #200d0d; border-color: #6a2a2a; color: #e85d5d; }
+
+    main { flex: 1; display: flex; overflow: hidden; }
+
+    #feed-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px; gap: 12px; overflow: hidden;
+    }
+    #feed {
+      border-radius: 10px; border: 1px solid #1e1e1e;
+      max-width: 100%; max-height: calc(100vh - 130px);
+    }
+    .feed-hint { font-size: 0.76rem; color: #444; }
+
+    #guide {
+      width: 300px; min-width: 260px;
+      background: #0f0f12; border-left: 1px solid #1a1a22;
+      overflow-y: auto; padding: 22px 18px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    #guide h2 {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: #4a8acd; margin-bottom: 10px;
+    }
+    .g-row {
+      display: flex; align-items: flex-start; gap: 11px;
+      padding: 9px 0; border-bottom: 1px solid #18181e;
+    }
+    .g-row:last-of-type { border-bottom: none; }
+    .g-icon   { font-size: 1.45rem; min-width: 34px; text-align: center; padding-top: 1px; }
+    .g-info   { display: flex; flex-direction: column; gap: 2px; }
+    .g-name   { font-size: 0.82rem; font-weight: 600; color: #ccc; }
+    .g-action { font-size: 0.75rem; color: #3a9ade; font-weight: 500; }
+
+    .warn {
+      margin-top: 14px; padding: 11px 13px;
+      background: #13110a; border: 1px solid #4a3800; border-radius: 8px;
+      font-size: 0.76rem; color: #b89040; line-height: 1.65;
+    }
+
+    #video { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← Home</a>
+    <h1>Gesture Browser Control</h1>
+    <span class="badge-main">Main Feature</span>
+    <div class="spacer"></div>
+    <span id="status-pill">● Connecting</span>
+  </header>
+
+  <main>
+    <!-- Live feed panel -->
+    <div id="feed-wrap">
+      <video id="video" autoplay></video>
+      <canvas id="feed"></canvas>
+      <p class="feed-hint">Keep your hand clearly visible · Good lighting recommended</p>
+    </div>
+
+    <!-- Gesture guide panel -->
+    <div id="guide">
+      <h2>Gesture Guide</h2>
+
+      <div class="g-row">
+        <div class="g-icon">☝️</div>
+        <div class="g-info">
+          <span class="g-name">Index finger</span>
+          <span class="g-action">Move mouse cursor</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">🤏</div>
+        <div class="g-info">
+          <span class="g-name">Pinch (thumb + index)</span>
+          <span class="g-action">Left click</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">✌️</div>
+        <div class="g-info">
+          <span class="g-name">Two fingers — upper half</span>
+          <span class="g-action">Scroll up</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">✌️</div>
+        <div class="g-info">
+          <span class="g-name">Two fingers — lower half</span>
+          <span class="g-action">Scroll down</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">🖖</div>
+        <div class="g-info">
+          <span class="g-name">Three fingers</span>
+          <span class="g-action">Next tab (Ctrl+Tab)</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">👈</div>
+        <div class="g-info">
+          <span class="g-name">Open palm — swipe left</span>
+          <span class="g-action">Go back (Alt+←)</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">👉</div>
+        <div class="g-info">
+          <span class="g-name">Open palm — swipe right</span>
+          <span class="g-action">Go forward (Alt+→)</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">✊</div>
+        <div class="g-info">
+          <span class="g-name">Fist</span>
+          <span class="g-action">Minimize window (Win+↓)</span>
+        </div>
+      </div>
+
+      <div class="g-row">
+        <div class="g-icon">✋</div>
+        <div class="g-info">
+          <span class="g-name">Open palm (still)</span>
+          <span class="g-action">Idle — no action</span>
+        </div>
+      </div>
+
+      <div class="warn">
+        ⚠️ The backend executes mouse &amp; keyboard actions on <strong>your local machine</strong>.
+        Actions apply to whichever window was active just before you made the gesture.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const video  = document.getElementById('video');
+    const feed   = document.getElementById('feed');
+    const ctx    = feed.getContext('2d');
+    const pill   = document.getElementById('status-pill');
+    const API    = 'http://127.0.0.1:8000';
+
+    feed.width  = 640;
+    feed.height = 480;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+        pill.textContent = '● Live';
+        pill.classList.add('live');
+      })
+      .catch(() => {
+        pill.textContent = '● Camera error';
+        pill.classList.add('error');
+      });
+
+    async function sendFrame() {
+      const tmp  = document.createElement('canvas');
+      tmp.width  = 640;
+      tmp.height = 480;
+      tmp.getContext('2d').drawImage(video, 0, 0, 640, 480);
+
+      const blob = await new Promise(r => tmp.toBlob(r, 'image/jpeg'));
+      const fd   = new FormData();
+      fd.append('file', blob);
+
+      try {
+        const res     = await fetch(`${API}/gesture/frame`, { method: 'POST', body: fd });
+        const imgBlob = await res.blob();
+        const img     = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, feed.width, feed.height);
+          URL.revokeObjectURL(img.src);
+        };
+        img.src = URL.createObjectURL(imgBlob);
+
+        if (!pill.classList.contains('live')) {
+          pill.textContent = '● Live';
+          pill.className   = 'live';
+        }
+      } catch {
+        pill.textContent = '● Backend offline';
+        pill.className   = 'error';
+      }
+
+      requestAnimationFrame(sendFrame);
+    }
+
+    sendFrame();
+  </script>
+</body>
+</html>
