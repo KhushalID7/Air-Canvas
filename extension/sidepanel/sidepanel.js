@@ -36,7 +36,6 @@ const COOLDOWNS = {
   scroll:   250,
   navigate: 1000,
   tab:      1000,
-  close:    1500,
 };
 const lastActionTime = {};
 
@@ -63,13 +62,6 @@ function isFingerUp(lm, tipIdx, pipIdx) {
   return lm[tipIdx].y < lm[pipIdx].y;
 }
 
-function isFistClosed(lm) {
-  return !isFingerUp(lm, 8,  6)  &&   // index
-         !isFingerUp(lm, 12, 10) &&   // middle
-         !isFingerUp(lm, 16, 14) &&   // ring
-         !isFingerUp(lm, 20, 18);     // pinky
-}
-
 function calcPinchDist(lm) {
   const dx = lm[8].x - lm[4].x;   // index tip – thumb tip
   const dy = lm[8].y - lm[4].y;
@@ -77,8 +69,6 @@ function calcPinchDist(lm) {
 }
 
 function classifyGesture(lm) {
-  if (isFistClosed(lm)) return 'fist';
-
   if (calcPinchDist(lm) < 0.07) return 'pinch';
 
   const idx   = isFingerUp(lm, 8,  6);
@@ -195,15 +185,6 @@ function handleGesture(gesture, lm) {
       if (canAct('tab')) {
         tabAction('NEXT_TAB');
         flashAction('Next tab →');
-      }
-      break;
-    }
-
-    // ── Fist: close current tab ────────────────────────────────────────────
-    case 'fist': {
-      if (canAct('close')) {
-        tabAction('CLOSE_TAB');
-        flashAction('Close tab ✕');
       }
       break;
     }

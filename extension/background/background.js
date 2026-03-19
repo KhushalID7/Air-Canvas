@@ -59,12 +59,6 @@ function handleTabAction(action) {
       });
       break;
 
-    case 'CLOSE_TAB':
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs.length) chrome.tabs.remove(tabs[0].id);
-      });
-      break;
-
     case 'RELOAD':
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs.length) chrome.tabs.reload(tabs[0].id);
