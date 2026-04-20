@@ -1,18 +1,9 @@
-// ─── GestureNav Content Script ─────────────────────────────────────────────────
-// Injected into every page. Handles:
-//   - Scroll commands
-//   - History navigation (back / forward)
-//   - Virtual cursor overlay (moveable dot that tracks finger position)
-//   - Simulated click at the cursor position
-
 (function () {
   'use strict';
 
-  // Prevent double-injection if the script is somehow re-run.
   if (window.__gestureNavLoaded) return;
   window.__gestureNavLoaded = true;
 
-  // ── Virtual cursor ────────────────────────────────────────────────────────────
   let cursor = null;
   let cursorX = window.innerWidth / 2;
   let cursorY = window.innerHeight / 2;
@@ -40,7 +31,6 @@
 
   function moveCursor(nx, ny) {
     ensureCursor();
-    // nx, ny are normalised [0,1] relative to viewport.
     cursorX = nx * window.innerWidth;
     cursorY = ny * window.innerHeight;
     cursor.style.left    = cursorX + 'px';
@@ -52,11 +42,9 @@
     if (cursor) cursor.style.display = 'none';
   }
 
-  // ── Simulated click ───────────────────────────────────────────────────────────
   function simulateClick() {
     ensureCursor();
 
-    // Flash the cursor red to give visual feedback.
     cursor.style.background   = 'rgba(239,68,68,0.9)';
     cursor.style.boxShadow    = '0 0 0 5px rgba(239,68,68,0.35)';
     setTimeout(() => {
@@ -66,8 +54,6 @@
       }
     }, 220);
 
-    // Find the element under the cursor (temporarily hide the cursor dot first
-    // so elementFromPoint doesn't return the cursor itself).
     cursor.style.display = 'none';
     const el = document.elementFromPoint(cursorX, cursorY);
     cursor.style.display = 'block';
@@ -83,7 +69,6 @@
     }
   }
 
-  // ── Message listener ──────────────────────────────────────────────────────────
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type !== 'PAGE_ACTION') return;
 

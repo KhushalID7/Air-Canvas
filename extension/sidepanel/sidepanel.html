@@ -6,14 +6,12 @@
   <title>GestureNav</title>
   <link rel="stylesheet" href="sidepanel.css" />
 
-  <!-- MediaPipe Hands — bundled locally (MV3 blocks external script-src) -->
   <script src="../lib/hands.js"></script>
   <script src="../lib/camera_utils.js"></script>
   <script src="../lib/drawing_utils.js"></script>
 </head>
 <body>
 
-  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <header class="header">
     <div class="brand">
       <span class="brand-icon">✋</span>
@@ -22,7 +20,6 @@
     <span id="statusPill" class="pill pill--idle">Idle</span>
   </header>
 
-  <!-- ── Camera preview ──────────────────────────────────────────────────── -->
   <div class="preview-wrap">
     <video id="video" autoplay playsinline muted style="display:none"></video>
     <canvas id="canvas" class="preview-canvas"></canvas>
@@ -30,13 +27,11 @@
     <div id="actionLabel" class="action-label"></div>
   </div>
 
-  <!-- ── Controls ────────────────────────────────────────────────────────── -->
   <div class="controls">
     <button id="toggleBtn" class="btn btn--start">Start Gesture Control</button>
     <p class="hint" id="hint">Click Start to enable webcam and begin tracking.</p>
   </div>
 
-  <!-- ── Gesture guide ───────────────────────────────────────────────────── -->
   <section class="guide">
     <h2 class="guide-title">Gesture Guide</h2>
     <table class="guide-table">
@@ -56,7 +51,6 @@
     </table>
   </section>
 
-  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
   <footer class="footer">
     MediaPipe Hands · Chrome MV3 · No backend required
   </footer>
